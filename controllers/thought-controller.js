@@ -82,12 +82,17 @@ const thoughtController = {
         .catch(err => res.json(err));
     },
 
-    addReaction({ params, body}, res) {
+    addReaction({ params, body }, res) {
         Thought.findOneAndUpdate(
             { _id: params.thoughtId },
             { $push: { reactions: body } },
             { new: true, runValidators: true }
         )
+        .populate({
+            path: 'reactions',
+            select: '-__v'
+        })
+        .select('-__v')
         .then(dbUserData => {
             if (!dbUserData) {
                 res.status(404).json({ message: 'No user found with this id!' });
